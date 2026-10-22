@@ -1,0 +1,9 @@
+{
+  "name": "netlab",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "runArgs": ["--privileged"],
+  "postCreateCommand": "bash -c \"$(curl -sL https://get.containerlab.dev)\" && pip install ansible docker && ansible-galaxy collection install community.docker"
+}
