@@ -1,0 +1,27 @@
+frr defaults datacenter
+hostname {{ inventory_hostname }}
+interface lo
+ ip address {{ lo }}/32
+{% for i in interfaces %}
+interface {{ i.name }}
+ ip address {{ i.ip }}
+{% endfor %}
+router bgp {{ asn }}
+ bgp router-id {{ lo }}
+ no bgp default ipv4-unicast
+{% for n in neighbors %}
+ neighbor {{ n.ip }} remote-as {{ n.asn }}
+{% endfor %}
+ address-family ipv4 unicast
+{% for n in neighbors %}
+  neighbor {{ n.ip }} activate
+{% endfor %}
+ exit-address-family
+ address-family l2vpn evpn
+{% for n in neighbors %}
+  neighbor {{ n.ip }} activate
+{% endfor %}
+{% if role == 'leaf' %}
+  advertise-all-vni
+{% endif %}
+ exit-address-family

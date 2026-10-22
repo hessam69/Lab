@@ -1,0 +1,2 @@
+[{"from":"users","to":"servers","proto":"icmp","port":"","action":"accept"},
+ {"from":"users","to":"servers","proto":"tcp","port":"443","action":"accept"}]

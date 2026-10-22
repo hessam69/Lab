@@ -64,6 +64,33 @@ topology:
         - ip link set vx20 master br20
         - ip link set vx20 up
         - ip link set br20 up
+    fw1:
+      kind: linux
+      image: fwlab:latest
+      binds:
+        - fw:/fw
+      ports:
+        - 8080:8080
+      cmd: python3 /fw/gui.py
+      exec:
+        - sysctl -w net.ipv4.ip_forward=1
+        - ip addr add 10.10.1.2/30 dev eth1
+        - ip addr add 10.20.1.1/24 dev eth2
+        - ip route add 10.30.1.0/24 via 10.10.1.1
+    srv1:
+      kind: linux
+      image: fwlab:latest
+      cmd: sh -c "python3 -m http.server 80 & python3 -m http.server 443"
+      exec:
+        - ip addr add 10.20.1.10/24 dev eth1
+        - ip route add 10.30.1.0/24 via 10.20.1.1
+    client1:
+      kind: linux
+      image: fwlab:latest
+      cmd: sleep infinity
+      exec:
+        - ip addr add 10.30.1.10/24 dev eth1
+        - ip route add 10.20.1.0/24 via 10.30.1.1
   links:
     - endpoints: ["spine1:eth1", "leaf1:eth1"]
     - endpoints: ["spine2:eth1", "leaf1:eth2"]
@@ -71,3 +98,6 @@ topology:
     - endpoints: ["spine2:eth2", "leaf2:eth2"]
     - endpoints: ["spine1:eth3", "leaf3:eth1"]
     - endpoints: ["spine2:eth3", "leaf3:eth2"]
+    - endpoints: ["leaf1:eth3", "fw1:eth1"]
+    - endpoints: ["fw1:eth2", "srv1:eth1"]
+    - endpoints: ["leaf3:eth3", "client1:eth1"]
