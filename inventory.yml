@@ -1,0 +1,13 @@
+all:
+  vars:
+    ansible_connection: community.docker.docker
+  children:
+    spines:
+      hosts:
+        clab-dc1-spine1:
+        clab-dc1-spine2:
+    leaves:
+      hosts:
+        clab-dc1-leaf1:
+        clab-dc1-leaf2:
+        clab-dc1-leaf3:

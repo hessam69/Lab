@@ -1,0 +1,16 @@
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: Render FRR config
+      ansible.builtin.template:
+        src: templates/frr.conf.j2
+        dest: /etc/frr/frr.conf
+      register: cfg
+    - name: Reload FRR
+      ansible.builtin.command: /usr/lib/frr/frr-reload.py --reload /etc/frr/frr.conf
+      when: cfg.changed
+    - name: Check BGP EVPN summary
+      ansible.builtin.command: vtysh -c 'show bgp l2vpn evpn summary'
+      register: out
+      changed_when: false
+    - ansible.builtin.debug: var=out.stdout_lines
